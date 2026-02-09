@@ -9,31 +9,54 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  release-linux-windows:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      
+
       - name: Install Fyne dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev
-      
+
       - name: Install fyne-cross
         run: go install github.com/fyne-io/fyne-cross@latest
-      
-      - name: Build for all platforms
+
+      - name: Build for Windows and Linux
         run: |
           fyne-cross windows -arch=amd64 -app-id com.github.tonvanbart.urlclean
           fyne-cross linux -arch=amd64 -app-id com.github.tonvanbart.urlclean
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             fyne-cross/dist/windows-amd64/*.exe.zip
             fyne-cross/dist/linux-amd64/*.tar.xz
+
+  release-darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install Fyne CLI
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Build for macOS
+        run: fyne package -os darwin -appID com.github.tonvanbart.urlclean
+
+      - name: Zip the app bundle
+        run: zip -r url-clean-darwin.zip url-clean.app
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: url-clean-darwin.zip
