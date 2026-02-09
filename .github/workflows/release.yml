@@ -30,12 +30,10 @@ jobs:
         run: |
           fyne-cross windows -arch=amd64 -app-id com.github.tonvanbart.urlclean
           fyne-cross linux -arch=amd64 -app-id com.github.tonvanbart.urlclean
-          fyne-cross darwin -arch=amd64 -app-id com.github.tonvanbart.urlclean
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            fyne-cross/dist/windows-amd64/*.exe
+            fyne-cross/dist/windows-amd64/*.exe.zip
             fyne-cross/dist/linux-amd64/*.tar.xz
-            fyne-cross/dist/darwin-amd64/*.zip
